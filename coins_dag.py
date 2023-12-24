@@ -2,17 +2,16 @@
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from main import get_top_trending_coins, move_dataframe_to_postgres
-import pendulum
+ # Correct usage of 'timezone' method
 
-TIMEZONE = pendulum.timezone("UTC")  # Correct usage of 'timezone' method
 
 
 # Define default_args for the DAG
 default_args = {
-    'owner': 'omni',
+    'owner': 'Michael George',
     'depends_on_past': False,
-    'start_date':pendulum.datetime(2021, 1, 1, tz="UTC"),
-    'email_on_failure': False,
+    'start_date':datetime.now(),
+    'email_on_failure': True,
     'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5)

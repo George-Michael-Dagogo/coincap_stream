@@ -1,3 +1,6 @@
+apache-airflow==2.8.0
+forex_python==1.8
 pandas==2.1.4
+pendulum==2.1.2
 psycopg2==2.9.9
 Requests==2.31.0
