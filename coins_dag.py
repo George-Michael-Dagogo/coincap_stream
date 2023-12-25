@@ -1,8 +1,8 @@
-#from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from main import get_top_trending_coins, move_dataframe_to_postgres
- # Correct usage of 'timezone' method
+
 
 
 
