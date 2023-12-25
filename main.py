@@ -4,6 +4,7 @@ from datetime import datetime
 from forex_python.converter import CurrencyRates, RatesNotAvailableError
 import psycopg2
 from psycopg2 import sql
+from sqlalchemy import create_engine
 
 def convert_currency(amount, from_currency, to_currency):
     c = CurrencyRates()
@@ -37,7 +38,7 @@ def get_top_trending_coins():
 
     response_trending_coins = requests.get(base_url + trending_coins_endpoint, params=params_trending_coins)
     data_trending_coins = response_trending_coins.json()
-
+    print(data_trending_coins)
     # Create a list of DataFrames for each coin
     dfs = []
 
@@ -77,59 +78,26 @@ def get_top_trending_coins():
 # Get information for the top 10 trending coins and store in a DataFrame
 trending_coins_df = get_top_trending_coins()
 
-# Display the DataFrame
-print(trending_coins_df)
-
-
 
 
 def move_dataframe_to_postgres(dataframe, table_name, connection_params):
-    # Get a PostgreSQL connection
-    connection = psycopg2.connect(**connection_params)
-    cursor = connection.cursor()
+    # Create a SQLAlchemy engine
+    engine = create_engine(f'postgresql://{connection_params["user"]}:{connection_params["password"]}@{connection_params["host"]}:{connection_params["port"]}/{connection_params["database"]}')
 
     # Create the table if it doesn't exist
-    create_table_query = f"""
-    CREATE TABLE IF NOT EXISTS {table_name} (
-        "Timestamp" TIMESTAMP,
-        "Name" VARCHAR(255),
-        "Symbol" VARCHAR(10),
-        "Current Price USD" NUMERIC,
-        "Market Cap USD" NUMERIC,
-        "24h Change" NUMERIC,
-        "Volume" NUMERIC
-    )
-    """
-    cursor.execute(create_table_query)
-    connection.commit()
+    dataframe.head(0).to_sql(table_name, engine, if_exists='replace', index=False)
 
-    # Convert DataFrame to list of tuples and insert into the PostgreSQL table
-    records = dataframe.to_records(index=False)
-    records_list = list(records)
-    insert_query = sql.SQL(f"INSERT INTO {table_name} VALUES %s").format(sql.SQL(',').join(map(sql.Literal, records_list)))
-    cursor.execute(insert_query)
-    connection.commit()
+    # Insert the records into the PostgreSQL table
+    dataframe.to_sql(table_name, engine, if_exists='append', index=False)
 
-    # Close the cursor and connection
-    cursor.close()
-    connection.close()
 
-# Get information for the top 10 trending coins and store in a DataFrame
-trending_coins_df = get_top_trending_coins()
-
-# Display the DataFrame
-print(trending_coins_df)
-
-# Define PostgreSQL connection parameters
 postgres_connection_params = {
-    "host": "localhost",
+    "host": "testtech.postgres.database.azure.com",
     "port": "5432",
-    "user": "your_username",
-    "password": "your_password",
-    "database": "your_database"
+    "user": "testtech",
+    "password": "George9042",
+    "database": "postgres"
 }
 table_name = "trending_coins"
 
-# Move the DataFrame to PostgreSQL
 move_dataframe_to_postgres(trending_coins_df, table_name, postgres_connection_params)
-
