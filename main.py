@@ -13,7 +13,6 @@ def convert_currency(amount, from_currency, to_currency):
         # Get the exchange rate
         exchange_rate = c.get_rate(from_currency, to_currency)
 
-        # Perform the conversion
         converted_amount = amount * exchange_rate
 
         return converted_amount
@@ -78,8 +77,6 @@ def get_top_trending_coins():
 # Get information for the top 10 trending coins and store in a DataFrame
 trending_coins_df = get_top_trending_coins()
 
-
-
 def move_dataframe_to_postgres(dataframe, table_name, connection_params):
     # Create a SQLAlchemy engine
     engine = create_engine(f'postgresql://{connection_params["user"]}:{connection_params["password"]}@{connection_params["host"]}:{connection_params["port"]}/{connection_params["database"]}')
@@ -95,7 +92,7 @@ postgres_connection_params = {
     "host": "testtech.postgres.database.azure.com",
     "port": "5432",
     "user": "testtech",
-    "password": "George9042",
+    "password": "your_password",
     "database": "postgres"
 }
 table_name = "trending_coins"
